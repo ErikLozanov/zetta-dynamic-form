@@ -1,5 +1,5 @@
 import React from 'react';
-import { useWatch, type Control, type UseFormRegister } from "react-hook-form";
+import { useWatch, type Control, type FieldErrors, type UseFormRegister } from "react-hook-form";
 import { 
   TextField, 
   MenuItem, 
@@ -11,17 +11,19 @@ import {
   FormLabel, 
   Box,
   Typography,
-  Paper
+  Paper,
+  FormHelperText
 } from '@mui/material';
-import type { FormField, FormGroup } from '../types/schema';
+import type { FormField, FormGroup, ValidationRule } from '../types/schema';
 
 interface DynamicFieldProps {
   field: FormField | FormGroup;
   register: UseFormRegister<any>;
   control: Control<any>;
+  errors: FieldErrors<any>;
 }
 
-export const DynamicField: React.FC<DynamicFieldProps> = ({ field, register, control }) => {
+export const DynamicField: React.FC<DynamicFieldProps> = ({ field, register, control, errors }) => {
   
   const shouldShow = () => {
     if (!field.visibleWhen || field.visibleWhen.length === 0) return true;
@@ -50,6 +52,7 @@ export const DynamicField: React.FC<DynamicFieldProps> = ({ field, register, con
               field={child} 
               register={register} 
               control={control}
+              errors={errors}
             />
           ))}
         </Box>
@@ -58,18 +61,50 @@ export const DynamicField: React.FC<DynamicFieldProps> = ({ field, register, con
   }
 
   const input = field as FormField;
+  const fieldError = errors[input.id]?.message as string | undefined;
+
+  const getValidationRules = (rules?: ValidationRule[]) => {
+    if (!rules) return {};
+    
+    const rhfRules: any = {};
+    
+    rules.forEach(rule => {
+      switch (rule.type) {
+        case 'required':
+          rhfRules.required = rule.message;
+          break;
+        case 'minLength':
+          rhfRules.minLength = { value: rule.value as number, message: rule.message };
+          break;
+        case 'maxLength':
+          rhfRules.maxLength = { value: rule.value as number, message: rule.message };
+          break;
+        case 'pattern':
+          rhfRules.pattern = { 
+            value: new RegExp(rule.value as string), 
+            message: rule.message 
+          };
+          break;
+      }
+    });
+    return rhfRules;
+  };
+
+  const validationProps = getValidationRules(input.validation);
 
   switch (input.type) {
     case 'text':
     case 'textarea':
       return (
         <TextField
-          {...register(input.id)}
+          {...register(input.id, validationProps)}
           label={input.label}
           placeholder={input.placeholder}
           multiline={input.type === 'textarea'}
           rows={input.type === 'textarea' ? 4 : 1}
           fullWidth
+          error={!!fieldError}
+          helperText={fieldError}
         />
       );
 
@@ -77,10 +112,12 @@ export const DynamicField: React.FC<DynamicFieldProps> = ({ field, register, con
       return (
         <TextField
           select
-          {...register(input.id)}
+          {...register(input.id, validationProps)}
           label={input.label}
           fullWidth
           defaultValue=""
+          error={!!fieldError}
+          helperText={fieldError}
         >
           {input.options?.map((opt) => (
             <MenuItem key={opt.value} value={opt.value}>
@@ -93,7 +130,7 @@ export const DynamicField: React.FC<DynamicFieldProps> = ({ field, register, con
     case 'checkbox':
       return (
         <FormControlLabel
-          control={<Checkbox {...register(input.id)} />}
+          control={<Checkbox {...register(input.id, validationProps)} />}
           label={input.label}
         />
       );
@@ -107,11 +144,12 @@ export const DynamicField: React.FC<DynamicFieldProps> = ({ field, register, con
               <FormControlLabel
                 key={opt.value}
                 value={opt.value}
-                control={<Radio {...register(input.id)} />}
+                control={<Radio {...register(input.id, validationProps)} />}
                 label={opt.label}
               />
             ))}
           </RadioGroup>
+          {fieldError && <FormHelperText>{fieldError}</FormHelperText>}
         </FormControl>
       );
 
