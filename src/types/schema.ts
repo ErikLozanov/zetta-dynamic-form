@@ -1,11 +1,17 @@
 export type FieldType = 'text' | 'textarea' | 'dropdown' | 'checkbox' | 'radio';
 
+export interface Dependency {
+  fieldId: string;
+  equals: string | number | boolean;
+}
+
 export interface FormField {
   id: string;
   type: FieldType;
   label: string;
   placeholder?: string;
   options?: { label: string; value: string | number }[];
+  visibleWhen?: Dependency[];
 }
 
 export interface FormGroup {
@@ -13,6 +19,7 @@ export interface FormGroup {
   title: string;
   type: 'group';
   children: (FormField | FormGroup)[];
+  visibleWhen?: Dependency[];
 }
 
 export interface FormSchema {

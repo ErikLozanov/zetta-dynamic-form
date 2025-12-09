@@ -1,4 +1,5 @@
 import React from 'react';
+import { useWatch, type Control, type UseFormRegister } from "react-hook-form";
 import { 
   TextField, 
   MenuItem, 
@@ -16,11 +17,27 @@ import type { FormField, FormGroup } from '../types/schema';
 
 interface DynamicFieldProps {
   field: FormField | FormGroup;
-  register: any; 
+  register: UseFormRegister<any>;
+  control: Control<any>;
 }
 
-export const DynamicField: React.FC<DynamicFieldProps> = ({ field, register }) => {
+export const DynamicField: React.FC<DynamicFieldProps> = ({ field, register, control }) => {
   
+  const shouldShow = () => {
+    if (!field.visibleWhen || field.visibleWhen.length === 0) return true;
+
+    return field.visibleWhen.every((dep) => {
+
+      const watchedValue = useWatch({
+        control,
+        name: dep.fieldId,
+      });
+      return watchedValue === dep.equals;
+    });
+  };
+
+  if (!shouldShow()) return null;
+
   if (field.type === 'group') {
     const group = field as FormGroup;
     return (
@@ -28,7 +45,12 @@ export const DynamicField: React.FC<DynamicFieldProps> = ({ field, register }) =
         <Typography variant="h6" gutterBottom>{group.title}</Typography>
         <Box display="flex" flexDirection="column" gap={2}>
           {group.children.map((child) => (
-            <DynamicField key={child.id} field={child} register={register} />
+            <DynamicField 
+              key={child.id} 
+              field={child} 
+              register={register} 
+              control={control}
+            />
           ))}
         </Box>
       </Paper>

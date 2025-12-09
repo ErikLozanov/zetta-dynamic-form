@@ -9,7 +9,8 @@ interface FormGeneratorProps {
 }
 
 export const FormGenerator: React.FC<FormGeneratorProps> = ({ schema }) => {
-  const { register, handleSubmit } = useForm();
+  
+  const { register, handleSubmit, control } = useForm();
 
   const onSubmit = (data: any) => {
     console.log("Form Submitted - ", data);
@@ -20,7 +21,7 @@ export const FormGenerator: React.FC<FormGeneratorProps> = ({ schema }) => {
     <form onSubmit={handleSubmit(onSubmit)}>
       <Box display="flex" flexDirection="column" gap={3}>
         {schema.fields.map((field) => (
-          <DynamicField key={field.id} field={field} register={register} />
+          <DynamicField key={field.id} field={field} register={register}  control={control} />
         ))}
         
         <Button variant="contained" color="primary" type="submit" size="large">
