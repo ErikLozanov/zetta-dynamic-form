@@ -1,42 +1,101 @@
-import { Container, CssBaseline, AppBar, Toolbar, Typography, Box, Paper } from '@mui/material';
+import {
+    Container,
+    AppBar,
+    Toolbar,
+    Typography,
+    Box,
+    Paper,
+    TextField,
+} from "@mui/material";
+import type { FormSchema } from "./types/schema";
+import { useState } from "react";
+
+const INITIAL_DATA: FormSchema = {
+    formTitle: "Project Requirements",
+    fields: [],
+};
 
 function App() {
-  return (
-    <>
-      <CssBaseline />
-      <AppBar position="static">
-        <Toolbar>
-          <Typography variant="h6">
-            Zetta Dynamic Form Builder
-          </Typography>
-        </Toolbar>
-      </AppBar>
+    const [jsonInput, setJsonInput] = useState(
+        JSON.stringify(INITIAL_DATA, null, 2)
+    );
+    const [parsedSchema, setParsedSchema] = useState<FormSchema | null>(
+        INITIAL_DATA
+    );
+    const [jsonError, setJsonError] = useState<string | null>(null);
 
-      <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
-        <Box display="grid" gridTemplateColumns={{ xs: '1fr', md: '1fr 1fr' }} gap={4}>
-          
-          <Paper elevation={3} sx={{ p: 2 }}>
-            <Typography variant="h5" gutterBottom>
-              Form Configuration (JSON)
-            </Typography>
-            <Box sx={{ height: '500px', bgcolor: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              JSON Editor Placeholder
-            </Box>
-          </Paper>
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const value = e.target.value;
+        setJsonInput(value);
 
-          <Paper elevation={3} sx={{ p: 2 }}>
-             <Typography variant="h5" gutterBottom>
-              Live Form
-            </Typography>
-            <Box sx={{ p: 2, border: '1px dashed grey', minHeight: '500px' }}>
-              Form Output Placeholder
-            </Box>
-          </Paper>
+        try {
+            const parsed = JSON.parse(value);
+            setParsedSchema(parsed);
+            setJsonError(null);
+            console.log("Schema updated - ", parsed);
+        } catch (err) {
+            setJsonError("Invalid JSON format");
+        }
+    };
 
-        </Box>
-      </Container>
-    </>
-  );
+    return (
+        <>
+            <AppBar position="static">
+                <Toolbar>
+                    <Typography variant="h6">Zetta Form Builder</Typography>
+                </Toolbar>
+            </AppBar>
+
+            <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
+                <Box
+                    display="grid"
+                    gridTemplateColumns={{ xs: "1fr", md: "1fr 1fr" }}
+                    gap={4}
+                >
+                    {/* Left side*/}
+                    <Paper elevation={3} sx={{ p: 2 }}>
+                        <Typography variant="h6" gutterBottom>
+                            JSON Configuration
+                        </Typography>
+                        <TextField
+                            multiline
+                            rows={20}
+                            fullWidth
+                            value={jsonInput}
+                            onChange={handleInputChange}
+                            error={!!jsonError}
+                            helperText={jsonError}
+                            sx={{ fontFamily: "monospace" }}
+                        />
+                    </Paper>
+
+                    {/* Right side*/}
+                    <Paper elevation={3} sx={{ p: 2 }}>
+                        <Typography variant="h6" gutterBottom>
+                            Form Preview
+                        </Typography>
+                        <Box
+                            sx={{
+                                p: 3,
+                                border: "1px dashed #ccc",
+                                borderRadius: 1,
+                            }}
+                        >
+                            {parsedSchema ? (
+                                <Typography color="text.secondary">
+                                    Ready to render: {parsedSchema.formTitle}
+                                </Typography>
+                            ) : (
+                                <Typography color="error">
+                                    Fix JSON to see form
+                                </Typography>
+                            )}
+                        </Box>
+                    </Paper>
+                </Box>
+            </Container>
+        </>
+    );
 }
 
 export default App;
