@@ -9,6 +9,7 @@ import {
 } from "@mui/material";
 import type { FormSchema } from "./types/schema";
 import { useState } from "react";
+import { FormGenerator } from "./components/FormGenerator";
 
 const INITIAL_DATA: FormSchema = {
     formTitle: "Project Requirements",
@@ -82,9 +83,7 @@ function App() {
                             }}
                         >
                             {parsedSchema ? (
-                                <Typography color="text.secondary">
-                                    Ready to render: {parsedSchema.formTitle}
-                                </Typography>
+                                <FormGenerator schema={parsedSchema} />
                             ) : (
                                 <Typography color="error">
                                     Fix JSON to see form
