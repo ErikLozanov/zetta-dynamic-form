@@ -1,35 +1,42 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { Container, CssBaseline, AppBar, Toolbar, Typography, Box, Paper } from '@mui/material';
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      <CssBaseline />
+      <AppBar position="static">
+        <Toolbar>
+          <Typography variant="h6">
+            Zetta Dynamic Form Builder
+          </Typography>
+        </Toolbar>
+      </AppBar>
+
+      <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
+        <Box display="grid" gridTemplateColumns={{ xs: '1fr', md: '1fr 1fr' }} gap={4}>
+          
+          <Paper elevation={3} sx={{ p: 2 }}>
+            <Typography variant="h5" gutterBottom>
+              Form Configuration (JSON)
+            </Typography>
+            <Box sx={{ height: '500px', bgcolor: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              JSON Editor Placeholder
+            </Box>
+          </Paper>
+
+          <Paper elevation={3} sx={{ p: 2 }}>
+             <Typography variant="h5" gutterBottom>
+              Live Form
+            </Typography>
+            <Box sx={{ p: 2, border: '1px dashed grey', minHeight: '500px' }}>
+              Form Output Placeholder
+            </Box>
+          </Paper>
+
+        </Box>
+      </Container>
     </>
-  )
+  );
 }
 
-export default App
+export default App;
