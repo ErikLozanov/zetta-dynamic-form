@@ -26,10 +26,17 @@ export interface FormGroup {
 export interface FormSchema {
   formTitle: string;
   fields: (FormField | FormGroup)[];
+  autoFill?: AutoFillRule[];
 }
 
 export interface ValidationRule {
   type: 'required' | 'pattern' | 'minLength' | 'maxLength';
   value?: string | number | boolean;
   message: string;
+}
+
+export interface AutoFillRule {
+  triggerFieldId: string;
+  method: 'getByZip';
+  mapping: { [apiResponseKey: string]: string };
 }

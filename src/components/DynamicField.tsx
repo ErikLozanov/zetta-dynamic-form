@@ -105,6 +105,9 @@ export const DynamicField: React.FC<DynamicFieldProps> = ({ field, register, con
           fullWidth
           error={!!fieldError}
           helperText={fieldError}
+          slotProps={{
+            inputLabel: { shrink: true, sx: { color: 'blue' } }
+          }}          
         />
       );
 
@@ -118,6 +121,9 @@ export const DynamicField: React.FC<DynamicFieldProps> = ({ field, register, con
           defaultValue=""
           error={!!fieldError}
           helperText={fieldError}
+          slotProps={{
+            inputLabel: { shrink: true, sx: { color: 'blue' } }
+          }}
         >
           {input.options?.map((opt) => (
             <MenuItem key={opt.value} value={opt.value}>
