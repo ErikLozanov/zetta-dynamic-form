@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { Box, Button, CircularProgress, Typography } from "@mui/material";
-import type { FormSchema } from "../types/schema";
+import type { FormField, FormGroup, FormSchema } from "../types/schema";
 import { DynamicField } from "./DynamicField";
 import { fetchLocationByZip } from "../services/api";
 
@@ -58,9 +58,33 @@ export const FormGenerator: React.FC<FormGeneratorProps> = ({ schema }) => {
         return () => subscription.unsubscribe();
     }, [watch, schema.autoFill, setValue]);
 
+    const buildStructuredData = (
+        fields: (FormField | FormGroup)[],
+        flatData: Record<string, any>
+    ) => {
+        const result: Record<string, any> = {};
+
+        fields.forEach((field) => {
+            if (field.type === "group") {
+                const group = field as FormGroup;
+                result[group.id] = buildStructuredData(group.children, flatData);
+            } else {
+                if (flatData[field.id] !== undefined) {
+                    result[field.id] = flatData[field.id];
+                }
+            }
+        });
+
+        return result;
+    };
+
     const onSubmit = (data: any) => {
-        console.log("Form Submitted - ", data);
-        alert("Form Submitted! Check console for JSON output.");
+        const structuredPayload = buildStructuredData(schema.fields, data);
+
+        console.log("Form Submitted (Raw) - ", data);
+        console.log("Form Submitted (Structured) - ", structuredPayload);
+
+        alert(`Form Submitted! Check console for sctructured JSON output.`);
     };
 
     return (
