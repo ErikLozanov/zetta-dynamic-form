@@ -176,7 +176,7 @@ export const FormGenerator: React.FC<FormGeneratorProps> = ({ schema }) => {
                     severity="success"
                     sx={{ width: '100%' }}
                 >
-                    Form submitted successfully!
+                    Form submitted successfully! (Check console for output.)
                 </Alert>
             </Snackbar>
         </form>
