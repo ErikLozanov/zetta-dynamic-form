@@ -16,19 +16,28 @@ const INITIAL_DATA: FormSchema = {
     fields: [],
 };
 
+const SCHEMA_KEY = "zetta_schema_cache";
+
 function App() {
-    const [jsonInput, setJsonInput] = useState(
-        JSON.stringify(INITIAL_DATA, null, 2)
-    );
-    const [parsedSchema, setParsedSchema] = useState<FormSchema | null>(
-        INITIAL_DATA
-    );
+    const [jsonInput, setJsonInput] = useState(() => {
+        const saved = localStorage.getItem(SCHEMA_KEY);
+        return saved || JSON.stringify(INITIAL_DATA, null, 2);
+    });
+    const [parsedSchema, setParsedSchema] = useState<FormSchema | null>(() => {
+        const saved = localStorage.getItem(SCHEMA_KEY);
+        try {
+            return saved ? JSON.parse(saved) : INITIAL_DATA;
+        } catch {
+            return INITIAL_DATA;
+        }
+    });
     const [jsonError, setJsonError] = useState<string | null>(null);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
         setJsonInput(value);
 
+        localStorage.setItem(SCHEMA_KEY, value);
         try {
             const parsed = JSON.parse(value);
             setParsedSchema(parsed);
