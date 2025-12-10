@@ -122,7 +122,6 @@ export const FormGenerator: React.FC<FormGeneratorProps> = ({ schema }) => {
         reset({}); 
         setRestoredFromSave(false);
 
-        alert(`Form Submitted! Check console for sctructured JSON output.`);
     };
 
     return (
@@ -160,6 +159,20 @@ export const FormGenerator: React.FC<FormGeneratorProps> = ({ schema }) => {
                     )}
                 </Box>
             </Box>
+            <Snackbar
+                open={successOpen}
+                autoHideDuration={6000}
+                onClose={() => setSuccessOpen(false)}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+            >
+                <Alert
+                    onClose={() => setSuccessOpen(false)}
+                    severity="success"
+                    sx={{ width: '100%' }}
+                >
+                    Form submitted successfully!
+                </Alert>
+            </Snackbar>
         </form>
     );
 };

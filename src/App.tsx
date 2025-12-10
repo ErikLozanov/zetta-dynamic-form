@@ -42,7 +42,6 @@ function App() {
             const parsed = JSON.parse(value);
             setParsedSchema(parsed);
             setJsonError(null);
-            console.log("Schema updated - ", parsed);
         } catch (err) {
             setJsonError("Invalid JSON format");
         }
