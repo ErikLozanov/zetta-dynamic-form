@@ -1,73 +1,147 @@
-# React + TypeScript + Vite
+# Zetta Form Builder
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Hi! This is my submission for the React assignment.
 
-Currently, two official plugins are available:
+I used **React Hook Form** for the state management and **Material UI** to keep it looking clean.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Features
+- **JSON to Form:** You paste JSON on the left, and the form updates instantly on the right.
+- **Nested Groups:** It handles deep nesting recursively, so you can have groups inside groups.
+- **Conditional Logic:** Try selecting "Manager" in the demo below—new fields will appear.
+- **Mock API:** If you type `90210` into the Zip Code field, it simulates an API call to autofill the City and State.
+- **Auto-Save:** I added a debounce function that saves your progress to localStorage. If you refresh, your data is still there.
+- **Validation:** Standard stuff like required fields, patterns, etc., are all supported.
 
-## React Compiler
+## How to Run It
+Standard Vite setup here. Just clone the repo and run:
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+npm install
+npm run dev
 
-## Expanding the ESLint configuration
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## How to Run Test
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+npm test
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+## JSON Tests
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
+### 1. Basic Inputs & Validation
+**Goal:** Verify all input types render and `required` validation works.
+- **Action:** Paste the JSON below. Click "Submit" without filling fields to see errors.
+```json
+{
+  "formTitle": "Basic Inputs & Validation Test",
+  "fields": [
+    {
+      "id": "fullName",
+      "type": "text",
+      "label": "Full Name",
+      "placeholder": "Enter your name",
+      "validation": [{ "type": "required", "message": "Name is required" }]
     },
-  },
-])
+    {
+      "id": "contactMethod",
+      "type": "radio",
+      "label": "Preferred Contact Method",
+      "options": [
+        { "label": "Email", "value": "email" },
+        { "label": "Phone", "value": "phone" }
+      ]
+    },
+    {
+      "id": "terms",
+      "type": "checkbox",
+      "label": "I agree to the Terms & Conditions",
+      "validation": [{ "type": "required", "message": "You must agree to continue" }]
+    }
+  ]
+}
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### 2. Dynamic Visibility (Conditional Logic)
+**Goal:** Verify fields show/hide based on dependencies.
+- **Action:** Select "Car" to see the Trunk field. Switch to "Truck" to see the Payload field.
+```json
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
+{
+  "formTitle": "Dynamic Visibility Test",
+  "fields": [
+    {
+      "id": "vehicleType",
+      "type": "dropdown",
+      "label": "Select Vehicle Type",
+      "options": [
+        { "label": "Car", "value": "car" },
+        { "label": "Truck", "value": "truck" }
+      ]
     },
-  },
-])
+    {
+      "id": "trunkSpace",
+      "type": "text",
+      "label": "Trunk Capacity (Liters)",
+      "visibleWhen": [{ "fieldId": "vehicleType", "equals": "car" }]
+    },
+    {
+      "id": "payloadCapacity",
+      "type": "text",
+      "label": "Payload Capacity (Tons)",
+      "visibleWhen": [{ "fieldId": "vehicleType", "equals": "truck" }]
+    }
+  ]
+}
+```
+
+
+### 3. API Integration (Auto-Fill)
+**Goal:** Verify the mock API works.
+- **Action:** Type 90210 into the Zip Code field. Wait ~1.5 seconds for City/State to auto-fill.
+
+```json
+{
+  "formTitle": "API Auto-Fill Test",
+  "fields": [
+    {
+      "id": "zipCode",
+      "type": "text",
+      "label": "Zip Code (Try 90210)",
+      "validation": [{ "type": "minLength", "value": 5, "message": "5 digits required" }]
+    },
+    { "id": "city", "type": "text", "label": "City (Auto-filled)" },
+    { "id": "state", "type": "text", "label": "State (Auto-filled)" }
+  ],
+  "autoFill": [
+    {
+      "triggerFieldId": "zipCode",
+      "method": "getByZip",
+      "mapping": { "city": "city", "state": "state" }
+    }
+  ]
+}
+```
+
+
+### 4. Recursive Nesting
+**Goal:** Verify groups can be nested inside other groups.
+```json
+{
+  "formTitle": "Deep Nesting Test",
+  "fields": [
+    {
+      "id": "level1",
+      "type": "group",
+      "title": "Level 1",
+      "children": [
+        {
+          "id": "level2",
+          "type": "group",
+          "title": "Level 2",
+          "children": [
+             { "id": "deepField", "type": "text", "label": "I am deep inside!" }
+          ]
+        }
+      ]
+    }
+  ]
+}
 ```
