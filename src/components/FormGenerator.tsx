@@ -20,11 +20,17 @@ export const FormGenerator: React.FC<FormGeneratorProps> = ({ schema }) => {
         watch,
         reset,
         formState: { errors },
-    } = useForm();
+    } = useForm({
+        shouldUnregister: true 
+    });
 
     const [loading, setLoading] = useState(false);
     const [successOpen, setSuccessOpen] = useState(false);
     const [restoredFromSave, setRestoredFromSave] = useState(false);
+
+    useEffect(() => {
+        reset({});
+    }, [schema, reset]);
 
     useEffect(() => {
         const subscription = watch((value) => {

@@ -29,7 +29,6 @@ export const DynamicField: React.FC<DynamicFieldProps> = ({ field, register, con
     if (!field.visibleWhen || field.visibleWhen.length === 0) return true;
 
     return field.visibleWhen.every((dep) => {
-
       const watchedValue = useWatch({
         control,
         name: dep.fieldId,
@@ -135,16 +134,19 @@ export const DynamicField: React.FC<DynamicFieldProps> = ({ field, register, con
 
     case 'checkbox':
       return (
-        <FormControlLabel
-          control={<Checkbox {...register(input.id, validationProps)} />}
-          label={input.label}
-        />
+        <FormControl error={!!fieldError} component="fieldset">
+          <FormControlLabel
+            control={<Checkbox {...register(input.id, validationProps)} />}
+            label={input.label}
+          />
+          {fieldError && <FormHelperText>{fieldError}</FormHelperText>}
+        </FormControl>
       );
 
     case 'radio':
       return (
-        <FormControl>
-          <FormLabel>{input.label}</FormLabel>
+        <FormControl error={!!fieldError} component="fieldset">
+          <FormLabel component="legend">{input.label}</FormLabel>
           <RadioGroup row>
             {input.options?.map((opt) => (
               <FormControlLabel
