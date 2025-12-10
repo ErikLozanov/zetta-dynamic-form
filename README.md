@@ -1,6 +1,6 @@
 # Zetta Form Builder
 
-Hi! This is my submission for the React assignment. I built a dynamic form generator that takes a JSON config and renders a fully functional React form—no hardcoded inputs involved.
+Hi! This is my submission for the React assignment.
 
 I used **React Hook Form** for the state management and **Material UI** to keep it looking clean.
 
